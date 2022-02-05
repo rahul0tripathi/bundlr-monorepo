@@ -1,3 +1,3 @@
 export const getAvatar = (str) => {
-  return `https://avatars.dicebear.com/api/pixel-art/${str}.svg`;
+  return `https://gravatar.com/avatar/${str}?d=identicon&r=x`;
 }

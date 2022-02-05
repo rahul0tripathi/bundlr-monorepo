@@ -33,7 +33,7 @@ export default function ButtonAppBar() {
                 }}>
           {state.get() != null ? (
             <Avatar alt="Remy Sharp" sx={{
-              height: "35px"
+              height: "30px",width:"30px"
             }} src={getAvatar(state.get())}/>
           ) : ("")
           }

@@ -21,10 +21,11 @@ const card = (
   <React.Fragment>
     <CardContent>
       <Box sx={{
-        height: "300px"
+        height: "300px",
+        backgroundColor:"black"
       }}>
         <model-viewer
-          style={{height: "300px", marginLeft: "8vw"}}
+          style={{height: "300px"}}
           src="/elite_box.gltf"
           poster="/elite.webp"
           alt="A 3D model of an astronaut"
@@ -54,16 +55,21 @@ const card = (
     </CardActions>
   </React.Fragment>
 );
-const card2 = (
+const card2 = (gitf,poster)=>{
+  return (
   <React.Fragment>
     <CardContent>
       <Box sx={{
-        height: "300px"
+        backgroundColor:"black",
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center"
       }}>
         <model-viewer
-          style={{height: "300px", marginLeft: "8vw"}}
-          src="/classic_box.gltf"
-          poster="/classic_box.webp"
+          style={{height: "30vw",width:"30vw"
+          }}
+          src={gitf}
+          poster={poster}
           alt="A 3D model of an astronaut"
           shadow-intensity="1"
           camera-controls
@@ -76,15 +82,16 @@ const card2 = (
       <Button size="small">Learn More</Button>
     </CardActions>
   </React.Fragment>
-);
+)}
 const card3 = (
   <React.Fragment>
     <CardContent>
       <Box sx={{
-        height: "300px"
+        height: "300px",
+        backgroundColor:"black"
       }}>
         <model-viewer
-          style={{height: "300px", marginLeft: "8vw"}}
+          style={{height: "300px"}}
           src="/semi_box.gltf"
           poster="/semi_box.webp"
           alt="A 3D model of an astronaut"
@@ -100,6 +107,11 @@ const card3 = (
     </CardActions>
   </React.Fragment>
 );
+function DefaultCard({gitf = "",poster=""}){
+  return (
+    <Card variant="outlined">{card2("/classic_box.gltf","/classic_box.webp")}</Card>
+  )
+}
 export default function OutlinedCard() {
   return (
     <Container maxWidth="lg">
@@ -111,25 +123,23 @@ export default function OutlinedCard() {
 
         <Grid
           item
-          spacing={4}
           md={6}
         >
-          <Card variant="outlined">{card3}</Card>
+          <Card variant="outlined">{card2("/semi_box.gltf","/semi_box.webp")}</Card>
         </Grid>
         <Grid
           item
-          spacing={4}
+
           md={6}
         >
-          <Card variant="outlined">{card}</Card>
+          <Card variant="outlined">{card2("/elite_box.gltf","/elite.webp")}</Card>
         </Grid>
         <Grid
           item
-          spacing={4}
           md={6}
         >
 
-          <Card variant="outlined">{card2}</Card>
+          <Card variant="outlined">{card2("/classic_box.gltf","/classic_box.webp")}</Card>
 
 
         </Grid>
