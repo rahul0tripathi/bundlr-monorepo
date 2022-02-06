@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig,  task } from "hardhat/config";
+import {  HardhatUserConfig,  task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
@@ -23,8 +24,24 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  solidity: {
+    version: "0.8.11",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+  },
   networks: {
+    hardhat: {
+      chainId: 1337,
+    },
+    matic: {
+      url: "https://rpc-mumbai.maticvigil.com/v1/6513fb247c676d70f3d33445ec007f80a71411cc",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
