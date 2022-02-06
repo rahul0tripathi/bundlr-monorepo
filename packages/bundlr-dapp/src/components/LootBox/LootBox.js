@@ -2,148 +2,189 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import "@google/model-viewer"
+import {makeStyles} from '@mui/styles';
+import {Container, Grid, Typography, createTheme, FormControl, InputLabel, Select, MenuItem} from "@mui/material";
+import {useMoralis, useWeb3ExecuteFunction} from "react-moralis";
+import {useEffect, useState} from "react";
+import {abi as FactoryAbi} from "../../contracts/BundlrFactory.json"
+import {abi as BundleAbi} from "../../contracts/Bundle.json"
+import {ethers} from 'ethers'
+import web3 from "web3"
+import Avatar from "@mui/material/Avatar";
+import {getAvatar} from "../../util";
+import {red} from "@mui/material/colors";
 
-import {Container, Grid, Typography} from "@mui/material";
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+const theme = createTheme({
+    typography: {
+        fontFamily: ["Open Sans", "sans-serif"]
+    }
+})
+const styles = makeStyles({
+    card: {
+        margin: "auto",
+        transition: "0.3s",
+        boxShadow: "0 8px 40px -12px rgba(0,0,0,0.3)",
+        "&:hover": {
+            boxShadow: "0 16px 70px -12.125px rgba(0,0,0,0.3)"
+        }
+    },
+    center: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    defaultFont: {
+        fontFamily: `Montserrat, sans-serif !important`
+    }
 
-const bull = (
-  <Box
-    component="span"
-    sx={{display: 'inline-block', mx: '2px', transform: 'scale(0.8)'}}
-  >
-    •
-  </Box>
-);
 
-const card = (
-  <React.Fragment>
-    <CardContent>
-      <Box sx={{
-        height: "300px",
-        backgroundColor:"black"
-      }}>
-        <model-viewer
-          style={{height: "300px"}}
-          src="/elite_box.gltf"
-          poster="/elite.webp"
-          alt="A 3D model of an astronaut"
-          shadow-intensity="1"
-          camera-controls
-          auto-rotate
-          ar
-        ></model-viewer>
-      </Box>
-      <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-        Word of the Day
-      </Typography>
-      <Typography variant="h5" component="div">
-        be{bull}nev{bull}o{bull}lent
-      </Typography>
-      <Typography sx={{mb: 1.5}} color="text.secondary">
-        adjective
-      </Typography>
-      <Typography variant="body2">
-        well meaning and kindly.
-        <br/>
-        {'"a benevolent smile"'}
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <Button size="small">Learn More</Button>
-    </CardActions>
-  </React.Fragment>
-);
-const card2 = (gitf,poster)=>{
-  return (
-  <React.Fragment>
-    <CardContent>
-      <Box sx={{
-        backgroundColor:"black",
-        display:"flex",
-        justifyContent:"center",
-        alignItems:"center"
-      }}>
-        <model-viewer
-          style={{height: "30vw",width:"30vw"
-          }}
-          src={gitf}
-          poster={poster}
-          alt="A 3D model of an astronaut"
-          shadow-intensity="1"
-          camera-controls
-          auto-rotate
-          ar
-        ></model-viewer>
-      </Box>
-    </CardContent>
-    <CardActions>
-      <Button size="small">Learn More</Button>
-    </CardActions>
-  </React.Fragment>
-)}
-const card3 = (
-  <React.Fragment>
-    <CardContent>
-      <Box sx={{
-        height: "300px",
-        backgroundColor:"black"
-      }}>
-        <model-viewer
-          style={{height: "300px"}}
-          src="/semi_box.gltf"
-          poster="/semi_box.webp"
-          alt="A 3D model of an astronaut"
-          shadow-intensity="1"
-          camera-controls
-          auto-rotate
-          ar
-        ></model-viewer>
-      </Box>
-    </CardContent>
-    <CardActions>
-      <Button size="small">Learn More</Button>
-    </CardActions>
-  </React.Fragment>
-);
-function DefaultCard({gitf = "",poster=""}){
-  return (
-    <Card variant="outlined">{card2("/classic_box.gltf","/classic_box.webp")}</Card>
-  )
+})
+const mintNewToken = async (address) => {
+    const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
+    let contract = new ethers.Contract(address, BundleAbi, provider)
+    await contract.connect(signer).mint();
 }
+
+
 export default function OutlinedCard() {
-  return (
-    <Container maxWidth="lg">
+    const classes = styles();
+    const {isAuthenticated, user} = useMoralis();
+    let [addresss, setAddress] = useState(null)
+    let [metadata, setMetadada] = useState([])
+    let [ownedTokens, setOwnedTokens] = useState({})
+    let [tokenToRedeem, settokenToRedeem] = useState(0);
+    const contract = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', FactoryAbi, provider)
+    const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
+    let collections = {}
+    const test = async () => {
+        let newMetaData = []
+        let count = await contract.collectionCount.call()
 
 
-      <Grid container spacing={4} sx={{
-        marginTop: "100px"
-      }}>
+        for (let i = 0; i < web3.utils.toBN(count).toNumber(); i++) {
+            let address = await contract.collections(i)
+            collections[address] = new ethers.Contract(address, BundleAbi, provider)
+            let m = await collections[address].collectionMetaData()
+            let count = await collections[address].balanceOf(await signer.getAddress());
+            if (web3.utils.toBN(count).toNumber() > 0) {
+                let newTokenList = []
+                for (let j = 0; j < web3.utils.toBN(count).toNumber(); j++) {
+                    let nToken = await collections[address].tokenOfOwnerByIndex(await signer.getAddress(), web3.utils.toBN(j).toString())
+                    newTokenList.push(nToken)
+                }
+                setOwnedTokens({
+                    ...ownedTokens,
+                    [address]: newTokenList
+                })
+            }
+            newMetaData.push({
+                address,
+                metadata: JSON.parse(m)
+            })
 
-        <Grid
-          item
-          md={6}
-        >
-          <Card variant="outlined">{card2("/semi_box.gltf","/semi_box.webp")}</Card>
-        </Grid>
-        <Grid
-          item
+        }
+        setMetadada(newMetaData)
 
-          md={6}
-        >
-          <Card variant="outlined">{card2("/elite_box.gltf","/elite.webp")}</Card>
-        </Grid>
-        <Grid
-          item
-          md={6}
-        >
+    }
+    const handleOnchange = (val) => {
+        settokenToRedeem(val.target.value)
 
-          <Card variant="outlined">{card2("/classic_box.gltf","/classic_box.webp")}</Card>
+    }
+    const redeem = async (address) => {
+        const collection = new ethers.Contract(address, BundleAbi, provider)
+        const txn = await collection.connect(signer).redeem(web3.utils.toBN(tokenToRedeem).toString(), {
+            value: ethers.utils.parseEther("1.0")
+        })
+    }
+    useEffect(() => {
 
+        console.log(signer)
+        console.log(isAuthenticated, "autj")
+        test()
 
-        </Grid>
-      </Grid>
-    </Container>
-  );
+    }, [isAuthenticated])
+    return (
+        <Container maxWidth="lg" className={`${classes.center}, ${classes.defaultFont}`}>
+            <Grid container spacing={2} sx={{
+                marginTop: "100px"
+            }}>
+                {metadata.length ? (
+                    metadata.map(x => {
+                        return <Grid
+                            item
+                            md={4}
+                        >
+                            <Card className={classes.card}
+                                  variant="outlined"><CardContent>
+                                <Box sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                }}>
+                                    <model-viewer
+                                        style={{
+                                            height: "30vw", width: "30vw"
+                                        }}
+                                        src={x?.gltf ? x.gltf : "/elite_box.gltf"}
+                                        poster={x?.poster ? x.poster : "/elite.webp"}
+                                        alt="A 3D model of an astronaut"
+                                        shadow-intensity="1"
+                                        camera-controls
+                                        auto-rotate
+                                        ar
+                                    />
+                                </Box>
+                                <Typography gutterBottom variant="h5" component="h2"
+                                            sx={{display: "inline", verticalAlign: "middle"}}>
+                                    {String(x.address).substring(0, 12) +
+                                        "..."}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary" component="p">
+                                    {x.description ? x.description : "This is a cool crate"}
+                                </Typography>
+                            </CardContent>
+                                <CardActions>
+                                    <Button variant="contained" onClick={() => mintNewToken(x?.address)}>Mint</Button>
+                                    {ownedTokens[x.address]?.length ? (
+                                        <FormControl
+                                            variant="standard"
+                                            sx={{width: "60px", margin: "10px"}}
+                                        >
+                                            <InputLabel
+                                                id="demo-simple-select-label"
+                                            >
+                                                Token Id
+                                            </InputLabel>
+
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                label="Token Id"
+                                                onChange={handleOnchange}
+                                            >
+                                                {
+                                                    ownedTokens[x.address].map(x => {
+                                                        return <MenuItem value={web3.utils.toBN(x).toString()}>
+                                                            {web3.utils.toBN(x).toString()}
+                                                        </MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        </FormControl>
+                                    ) : ""}
+                                    <Button variant="contained" onClick={() => redeem(x.address)}>Redeem</Button>
+                                </CardActions></Card>
+                        </Grid>
+                    })
+
+                ) : ""}
+            </Grid>
+        </Container>
+    );
 }
