@@ -4,7 +4,11 @@ import Navbar from './components/Navbar/Navbar'
 import LootBox from './components/LootBox/LootBox'
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{
+
+
+
+    }}>
       <Navbar/>
       <LootBox/>
     </div>

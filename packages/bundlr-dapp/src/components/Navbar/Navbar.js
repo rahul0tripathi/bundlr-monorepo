@@ -3,41 +3,38 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import {useMoralis, useMoralisWeb3Api} from "react-moralis";
+import {useMoralis} from "react-moralis";
 import Avatar from '@mui/material/Avatar';
 import {accountAddress} from '../../states/index'
 import {useState as hookState} from "@hookstate/core";
-import {useState} from "react";
-import {makeStyles} from "@mui/styles";
 import {getAvatar} from "../../util"
-import {Modal} from "@mui/material";
-import CreateNewCollection from "../newCollection/NewCollection";
+import {Chip, Stack} from "@mui/material";
 
 export default function ButtonAppBar() {
     const {authenticate, isAuthenticated, user, logout, account} = useMoralis();
     const state = hookState(accountAddress);
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+
     const updateState = () => {
         state.set(user.get('ethAddress'))
     }
     return (
         <AppBar position="static" sx={{backgroundColor: "black"}}>
             <Toolbar>
-                <Typography type="title" color="inherit" style={{flex: 1}}>
+
+                <Typography type="title" color="inherit" style={{flex: 1, fontSize: "30px"}}>
                     BUNDLR
+                    <Chip label="MUMBAI" sx={{
+                        backgroundColor: "red",
+                        color: "white",
+                        height: "15px",
+                        fontWeight: "bold",
+                        margin: "5px",
+                        fontSize: "8px",
+                        verticalAlign: "top"
+                    }}/>
                 </Typography>
-                <Button variant="outlined" color="inherit" edge="end">
-                    <Typography
-                        variant="p"
-                        sx={{
-                            fontSize: "0.7rem",
-                            display: {xs: "none", md: "block"},
-                        }}
-                        onClick={handleOpen}
-                    >New Collection</Typography>
-                </Button>
+
+
                 <Button variant="outlined" color="inherit" edge="end"
                         onClick={() => {
                             if (!isAuthenticated) {
@@ -67,14 +64,7 @@ export default function ButtonAppBar() {
                             : `Connect To Wallet`}
                     </Typography></Button>
             </Toolbar>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <CreateNewCollection/>
-            </Modal>
+
         </AppBar>
 
     );

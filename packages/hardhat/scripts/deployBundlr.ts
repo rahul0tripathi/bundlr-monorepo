@@ -1,38 +1,30 @@
 /* eslint-disable prettier/prettier */
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
-import {  ethers } from "hardhat";
+import { ethers } from "hardhat";
 import web3 from "web3";
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
-  // We get the contract to deploy
   const [collectionOwner] = await ethers.getSigners();
-  const BundlrFactory = await ethers.getContractFactory("BundlrFactory",{
-    signer:collectionOwner
+  const BundlrFactory = await ethers.getContractFactory("BundlrFactory", {
+    signer: collectionOwner,
   });
-  const bundler = await BundlrFactory.deploy();
+  const bundler = await BundlrFactory.deploy(
+    "0x8C7382F9D8f56b33781fE506E897a4F1e2d17255",
+    "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+    "0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4",
+    ethers.utils.parseEther("0.0001")
+  );
 
   await bundler.deployed();
-  
+
   console.log("bundler deployed to:", bundler.address);
   const metadata = JSON.stringify({
-    decription: "redeem exciting new axies from these crates",
+    description: "redeem exciting new in-game SCI-FI items",
   });
   const newCollectionTxn = await bundler
     .connect(collectionOwner)
     .createNewCollection(
       web3.utils.toBN(10).toString(),
-      "AXS",
-      "AXSCRATE",
+      "SCC",
+      "SCFCRATE",
       metadata
     );
   await newCollectionTxn.wait();

@@ -7,11 +7,25 @@ import {Bundle} from "./bundlr.sol";
 contract BundlrFactory {
     using Counters for Counters.Counter;
     address[] public collections;
+    bytes32 internal keyHash;
+    uint256 internal fee;
+    address internal vrfCoordinator;
+    address internal link;
     mapping(uint256 => address) private _collectionsList;
 
     Counters.Counter public collectionCount;
 
-    constructor() {}
+    constructor(
+        address _vrfCoordinator,
+        address _link,
+        bytes32 _keyHash,
+        uint256 _fee
+    ) {
+        vrfCoordinator = _vrfCoordinator;
+        link = _link;
+        keyHash = _keyHash;
+        fee = _fee;
+    }
 
     function createNewCollection(
         uint256 maxSupply,
@@ -21,7 +35,17 @@ contract BundlrFactory {
     ) external {
         collectionCount.increment();
         address newCollection = address(
-            new Bundle(maxSupply, symbol, name, metadata,msg.sender)
+            new Bundle(
+                maxSupply,
+                symbol,
+                name,
+                metadata,
+                msg.sender,
+                vrfCoordinator,
+                link,
+                keyHash,
+                fee
+            )
         );
         _collectionsList[collectionCount.current()] = newCollection;
         collections.push(newCollection);

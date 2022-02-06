@@ -7,12 +7,14 @@ import {MoralisProvider} from "react-moralis";
 import * as config from './config/index'
 
 ReactDOM.render(
-  <React.StrictMode>
-    <MoralisProvider appId={config.default.MORALIS.API_KEY} serverUrl={config.default.MORALIS.SERVER_URL}>
-      <App/>
-    </MoralisProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <MoralisProvider appId={config.default.MORALIS.API_KEY} serverUrl={config.default.MORALIS.SERVER_URL}>
+            <App style={{
+
+            }}/>
+        </MoralisProvider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
