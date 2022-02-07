@@ -8,10 +8,10 @@ import Avatar from '@mui/material/Avatar';
 import {accountAddress} from '../../states/index'
 import {useState as hookState} from "@hookstate/core";
 import {getAvatar} from "../../util"
-import {Chip, Stack} from "@mui/material";
+import {Chip} from "@mui/material";
 
 export default function ButtonAppBar() {
-    const {authenticate, isAuthenticated, user, logout, account} = useMoralis();
+    const {authenticate, isAuthenticated, user} = useMoralis();
     const state = hookState(accountAddress);
 
     const updateState = () => {

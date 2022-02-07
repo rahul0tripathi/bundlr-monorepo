@@ -1,10 +1,10 @@
-import {useMoralis} from "react-moralis";
+
 import {useState} from "react";
-import {accountAddress} from "../../states";
+
 import * as React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import {FormControl, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {FormControl, TextField} from "@mui/material";
 import web3 from "web3";
 import Button from "@mui/material/Button";
 import {ethers} from "ethers";
@@ -44,6 +44,7 @@ export default function CreateNewCollection({address = ""}) {
 
     const submit = async () => {
         try {
+            console.log(erc721Address)
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             const contract = new ethers.Contract(address, BundleAbi, provider);
             const bundleLength = web3.utils.toBN(await contract.MAX_SUPPLY()).toNumber();
@@ -53,7 +54,7 @@ export default function CreateNewCollection({address = ""}) {
             if (erc20Amt < min20 * bundleLength) {
                 alert("invalid min config")
             }
-            if (erc20Address != null || erc20Address != "") {
+            if (erc20Address != null || erc20Address !== "") {
                 const ERC20COntract = new ethers.Contract(erc20Address, IERC721, provider);
                 const connectTxn = await ERC20COntract.connect(signer).approve(
                     address,

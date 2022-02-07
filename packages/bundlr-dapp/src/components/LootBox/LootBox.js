@@ -16,7 +16,6 @@ import {
     MenuItem,
     Modal
 } from "@mui/material";
-import {useMoralis, useWeb3ExecuteFunction} from "react-moralis";
 import {useEffect, useState} from "react";
 import {abi as FactoryAbi} from "../../contracts/BundlrFactory.json"
 import {abi as BundleAbi} from "../../contracts/Bundle.json"
@@ -64,7 +63,6 @@ const mintNewToken = async (address) => {
 
 export default function OutlinedCard() {
     const classes = styles();
-    const {isAuthenticated, user} = useMoralis();
     let [metadata, setMetadada] = useState([])
     let [ownedTokens, setOwnedTokens] = useState({})
     let [tokenToRedeem, settokenToRedeem] = useState(0);
@@ -117,7 +115,7 @@ export default function OutlinedCard() {
             try {
                 const collection = new ethers.Contract(address, BundleAbi, provider)
                 const amount = await collection.getCurrentRedeemPrice();
-                const txn = await collection.connect(signer).redeem(web3.utils.toBN(tokenToRedeem).toString(), {
+                 await collection.connect(signer).redeem(web3.utils.toBN(tokenToRedeem).toString(), {
                     value: amount
                 })
             } catch (err) {
@@ -129,7 +127,7 @@ export default function OutlinedCard() {
         useEffect(() => {
             init()
 
-        }, [isAuthenticated])
+        }, [init])
 
         return (
             <Box
