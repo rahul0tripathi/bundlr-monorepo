@@ -71,9 +71,10 @@ export default function OutlinedCard() {
 
         const handleOpen = () => setOpen(true);
         const handleClose = () => setOpen(false);
+        provider = new ethers.providers.Web3Provider(window.ethereum)
         const contract = new ethers.Contract(config.default.BaseContractAddress, FactoryAbi, provider)
         const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
-        provider = new ethers.providers.Web3Provider(window.ethereum)
+
 
         let collections = {}
         const init = async () => {
